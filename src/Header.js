@@ -7,7 +7,7 @@ class Header extends React.Component {
     render() {
         return (
             <div className="header">
-                <h2>Header</h2>
+                <input placeholder={this.props.placeholder} onChange={this.props.onchange} />
             </div>
         )
     }

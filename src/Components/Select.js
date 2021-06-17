@@ -8,9 +8,9 @@ class Select extends React.Component {
         return (
             <div className="select">
                 <select onChange={this.props.onchange}>
-                    <option value="worldwide">Global</option>
+                    <option key="all" value="all">Global</option>
                     {this.props.list.map((country) => (
-                        <option value={country.countryInfo.iso2} >{country.country}</option>
+                        <option key={country.countryInfo.iso2} value={country.countryInfo.iso2} >{country.country}</option>
                     ))}
                 </select>
             </div>

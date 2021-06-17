@@ -40,3 +40,17 @@
   flex-wrap: wrap;
   justify-content: space-evenly;
 }
+.statswrapper{
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+.selectwrapper{
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+.chart{
+  width: 600px;
+  margin-left: 300px;
+}

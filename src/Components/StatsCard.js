@@ -7,7 +7,7 @@ class StatsCard extends React.Component {
         return (
             <div className="statscard">
                 <h2>{this.props.heading}</h2>
-                <p>{this.props.cases}</p>
+                <p>{this.props.todayCases}</p>
             </div>
         )
     }

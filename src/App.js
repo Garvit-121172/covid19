@@ -20,7 +20,9 @@ class App extends React.Component {
       Xvalue: [],
       caseValues: [],
       deathValues: [],
-      recoveredValues: []
+      recoveredValues: [],
+      x: [1, 2, 3],
+      y: [1, 2, 3]
     };
   }
   serchHandler = (e) => {
@@ -30,15 +32,14 @@ class App extends React.Component {
     await this.setState({ selectField: e.target.value });
     const eachCountry = await fetch(`https://disease.sh/v3/covid-19/historical/${this.state.selectField}?lastdays=${this.state.selectTime}`);
     const eachData = await eachCountry.json();
-    console.log(eachData.timeline);
-    const caseXval = [];
-    var caseYval = [];
-    for (let x in eachData.timeline.cases) {
-      await caseXval.push(x);
-    }
-    caseYval = await Object.values(eachData.timeline.cases);
-    await this.setState({ Xvalue: caseXval });
-    await this.setState({ caseValues: caseYval });
+    // const caseXval = [];
+    // var caseYval = [];
+    // for (let x in eachData.timeline.cases) {
+    //   await caseXval.push(x);
+    // }
+    // caseYval = await Object.values(eachData.timeline.cases);
+    // await this.setState({ Xvalue: caseXval });
+    // await this.setState({ caseValues: caseYval });
     await this.setState({ selectData: eachData });
     const stats = this.state.selectField === "all" ? await fetch(`https://disease.sh/v3/covid-19/${this.state.selectField}`) : await fetch(`https://disease.sh/v3/covid-19/countries/${this.state.selectField}?stict=true`);
     const statsData = await stats.json();
@@ -53,8 +54,21 @@ class App extends React.Component {
     await this.setState({ statsData });
     await this.setState({ selectData: eachData });
   }
+  static getDerivedStateFromProps(props, state) {
+    fetch(`https://disease.sh/v3/covid-19/historical/all?lastdays=30`)
+      .then(res => res.json())
+      .then(data => {
+        if (state.Xvalue.length == 0)
+          for (let x in data.cases) {
+            state.Xvalue.push(x);
+          }
+        state.caseValues = Object.values(data.cases);
+        state.deathValues = Object.values(data.deaths);
+        state.recoveredValues = Object.values(data.recovered);
 
 
+      })
+  }
   async componentDidMount() {
     const allcountries = await fetch("https://disease.sh/v3/covid-19/countries");
     const countries = await allcountries.json();
@@ -67,7 +81,6 @@ class App extends React.Component {
     this.setState({ statsData });
   }
   render() {
-    console.log(this.state.Xvalue);
     const { countries, searchField } = this.state;
     const filteredData = countries.filter((each) => each.country.toLowerCase().includes(searchField.toLowerCase()));
     filteredData.sort((a, b) => (a.cases > b.cases ? -1 : 1))
@@ -78,7 +91,7 @@ class App extends React.Component {
           <Select list={this.state.countries} onchange={this.selectHandler} />
           <SelectTime onchange={this.selectTimeHandler} />
         </div>
-        <MyChart caseXval={this.state.Xvalue} caseYval={this.state.caseValues} />
+        <MyChart x1={this.state.Xvalue} y1={this.state.caseValues} y2={this.state.deathValues} y3={this.state.recoveredValues} />
         <StatsWrapper todayCases={this.state.statsData.todayCases} todayDeaths={this.state.statsData.todayDeaths} todayRecovered={this.state.statsData.todayRecovered} />
         <CountryWrapper data={filteredData} />
       </div>

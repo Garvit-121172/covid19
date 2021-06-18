@@ -3,37 +3,50 @@ import { Line } from 'react-chartjs-2';
 class MyChart extends React.Component {
     constructor(props) {
         super(props);
-        console.log(props.caseYval);
+        this.state = {
+            x1: props.x1,
+            y1: props.y1,
+            y2: props.y2,
+            y3: props.y3
+        }
     }
-    data = {
-        labels: this.props.caseXval,
-        datasets: [
-            {
-                label: "TotalCases",
-                data: this.props.caseYval,
-                fill: true,
-                backgroundColor: "rgba(75,192,192,0.2)",
-                borderColor: "rgba(75,192,192,1)"
-            },
-            {
-                label: "Deaths",
-                data: [3, 5, 8, 4, 4, 6],
-                fill: true,
-                backgroundColor: "rgba(75,192,192,0.2)",
-                borderColor: "rgba(75,192,192,1)"
-            },
-            {
-                label: "Recovered",
-                data: [33, 25, 35, 51, 54, 76],
-                fill: false,
-                borderColor: "#742774"
-            }
-        ]
+
+    static getDerivedStateFromProps(props, state) {
+        state.x1 = props.x1;
+        state.y1 = props.y1;
+        state.y2 = props.y2;
+        state.y3 = props.y3;
     }
     render() {
+        const data = {
+            labels: this.state.x1,
+            datasets: [
+                {
+                    label: "TotalCases",
+                    data: this.state.y1,
+                    fill: true,
+                    backgroundColor: "rgba(75,192,192,0.2)",
+                    borderColor: "rgba(75,192,192,1)"
+                },
+                {
+                    label: "Deaths",
+                    data: this.state.y2,
+                    fill: true,
+                    backgroundColor: "rgba(75,192,192,0.2)",
+                    borderColor: "rgba(75,192,192,1)"
+                },
+                {
+                    label: "Recovered",
+                    data: this.state.y3,
+                    fill: false,
+                    borderColor: "#742774"
+                }
+            ]
+        }
+
         return (
             <div className="chart">
-                <Line data={this.data} />
+                <Line data={data} />
             </div>
         )
     }

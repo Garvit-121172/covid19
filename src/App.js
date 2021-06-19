@@ -6,23 +6,26 @@ import Select from './Components/Select.js';
 import StatsWrapper from "./Components/StatsWrapper";
 import SelectTime from "./Components/SelectTime";
 import MyChart from "./Components/MyChart"
+// import MyMap from './Components/MyMap';
+import SMap from './Components/SMap';
+import ReactDOM from "react-dom";
+import ReactTooltip from "react-tooltip";
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      content: "",
       countries: [],
       searchField: "",
       selectField: "all",
       chartData: {},
       selectData: {},
-      selectTime: {},
+      selectTime: 7,
       statsData: {},
       Xvalue: [],
       caseValues: [],
       deathValues: [],
       recoveredValues: [],
-      x: [1, 2, 3],
-      y: [1, 2, 3]
     };
   }
   serchHandler = (e) => {
@@ -32,18 +35,13 @@ class App extends React.Component {
     await this.setState({ selectField: e.target.value });
     const eachCountry = await fetch(`https://disease.sh/v3/covid-19/historical/${this.state.selectField}?lastdays=${this.state.selectTime}`);
     const eachData = await eachCountry.json();
-    // const caseXval = [];
-    // var caseYval = [];
-    // for (let x in eachData.timeline.cases) {
-    //   await caseXval.push(x);
-    // }
-    // caseYval = await Object.values(eachData.timeline.cases);
-    // await this.setState({ Xvalue: caseXval });
-    // await this.setState({ caseValues: caseYval });
     await this.setState({ selectData: eachData });
     const stats = this.state.selectField === "all" ? await fetch(`https://disease.sh/v3/covid-19/${this.state.selectField}`) : await fetch(`https://disease.sh/v3/covid-19/countries/${this.state.selectField}?stict=true`);
     const statsData = await stats.json();
     await this.setState({ statsData });
+  }
+  setContent = async (e) => {
+    this.setState({ content: e.target.value })
   }
   selectTimeHandler = async (e) => {
     await this.setState({ selectTime: e.target.value });
@@ -55,18 +53,26 @@ class App extends React.Component {
     await this.setState({ selectData: eachData });
   }
   static getDerivedStateFromProps(props, state) {
-    fetch(`https://disease.sh/v3/covid-19/historical/all?lastdays=30`)
+    const url = `https://disease.sh/v3/covid-19/historical/${state.selectField}?lastdays=${state.selectTime}`;
+    fetch(url)
       .then(res => res.json())
       .then(data => {
-        if (state.Xvalue.length == 0)
-          for (let x in data.cases) {
-            state.Xvalue.push(x);
+        if (state.selectField === "all") {
+          if (state.Xvalue.length !== data.cases.length) {
+            state.Xvalue = Object.keys(data.cases);
           }
-        state.caseValues = Object.values(data.cases);
-        state.deathValues = Object.values(data.deaths);
-        state.recoveredValues = Object.values(data.recovered);
-
-
+          state.caseValues = Object.values(data.cases);
+          state.deathValues = Object.values(data.deaths);
+          state.recoveredValues = Object.values(data.recovered);
+        }
+        else {
+          if (state.Xvalue.length !== data.timeline.recovered.length) {
+            state.Xvalue = Object.keys(data.timeline.cases);
+          }
+          state.caseValues = Object.values(data.timeline.cases);
+          state.deathValues = Object.values(data.timeline.deaths);
+          state.recoveredValues = Object.values(data.timeline.recovered);
+        }
       })
   }
   async componentDidMount() {
@@ -92,6 +98,9 @@ class App extends React.Component {
           <SelectTime onchange={this.selectTimeHandler} />
         </div>
         <MyChart x1={this.state.Xvalue} y1={this.state.caseValues} y2={this.state.deathValues} y3={this.state.recoveredValues} />
+
+        <SMap setTooltipContent={this.setContent} />
+        <ReactTooltip>{this.state.content}</ReactTooltip>
         <StatsWrapper todayCases={this.state.statsData.todayCases} todayDeaths={this.state.statsData.todayDeaths} todayRecovered={this.state.statsData.todayRecovered} />
         <CountryWrapper data={filteredData} />
       </div>

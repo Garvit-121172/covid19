@@ -12,10 +12,12 @@ class MyChart extends React.Component {
     }
 
     static getDerivedStateFromProps(props, state) {
-        state.x1 = props.x1;
-        state.y1 = props.y1;
-        state.y2 = props.y2;
-        state.y3 = props.y3;
+        if (state.y3 !== props.y3) {
+            state.x1 = props.x1;
+            state.y1 = props.y1;
+            state.y2 = props.y2;
+            state.y3 = props.y3;
+        }
     }
     render() {
         const data = {
